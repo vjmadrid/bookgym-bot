@@ -1,0 +1,16 @@
+version: '3'
+services:
+
+  bookgym-bot:
+    image: bookgym-bot
+    environment:
+      email: xxxxx@gmail.com
+      password: yyyy
+      booking-goals: "{'\"0\":[{\"time\":\"1800\",\"name\":\"WoD (main)\"},{\"time\":\"1900\",\"name\":\"Strength (main)\"}],\"3\":[{\"time\":\"1800\",\"name\":\"Olympic\"},{\"time\":\"1900\",\"name\":\"WoD\"}],\"4\":[{\"time\":\"2000\",\"name\":\"WoD\"}],\"5\":[{\"time\":\"0900\",\"name\":\"Endurance\"},{\"time\":\"1000\",\"name\":\"Open\"}],\"6\":[{\"time\":\"1000\",\"name\":\"Endurance\"},{\"time\":\"1100\",\"name\":\"Open\"}]'}"
+      box-name: cfsantsbcn
+      box-id: 9678
+      days-in-advance: 3
+    command: make run-in-docker
+    volumes:
+      - ./vol-logs/logs:/usr/src/app/logs
+
