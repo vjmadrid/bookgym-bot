@@ -5,6 +5,7 @@ import time
 import logging
 import sys
 import os
+from flask import Flask
 
 from datetime import datetime, timedelta
 
@@ -13,13 +14,18 @@ from src.client import AimHarderClient
 from src.services import BookingService
 from src.exceptions import BookingFailed
 from src.logging_utils import setup_logger
-
+from src.api.manager.routes import manager_bp
 
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 setup_logger(app_path=APP_DIR)
 
 LOG = logging.getLogger(__name__)
+
+app = Flask(__name__)
+app.register_blueprint(manager_bp)
+
+
 
 
 def get_class_to_book(day_classes: list[dict], target_time: str, class_name: str):
@@ -101,6 +107,8 @@ def main(email, password, booking_goals, box_name, box_id, days_in_advance):
 
 
 if __name__ == "__main__":
+    
+
     """
     python src/main.py
         --email your.email@mail.com
@@ -121,14 +129,21 @@ if __name__ == "__main__":
     input = {key: value for key, value in args.__dict__.items() if value != ""}
     # print("[*] Loaded Parameters :: " + str(input))
 
+    """
+        Start Flask Server
+    """
+    app.run(debug=True)
+
 
 def job():
     LOG.info("[*] Job 'Schedule' :: " + str(datetime.now()))
     main(**input)
 
-schedule.every().hour.at("00:15").do(job)
+@app.route("/start")
+def start():
+    schedule.every().hour.at("00:15").do(job)
 
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
 
