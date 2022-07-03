@@ -22,8 +22,8 @@ setup_logger(app_path=APP_DIR)
 
 LOG = logging.getLogger(__name__)
 
-app = Flask(__name__)
-app.register_blueprint(manager_bp)
+#app = Flask(__name__)
+#app.register_blueprint(manager_bp)
 
 
 
@@ -132,18 +132,18 @@ if __name__ == "__main__":
     """
         Start Flask Server
     """
-    app.run(debug=True)
+    #app.run(debug=True)
 
 
 def job():
     LOG.info("[*] Job 'Schedule' :: " + str(datetime.now()))
     main(**input)
 
-@app.route("/start")
-def start():
-    schedule.every().hour.at("00:15").do(job)
 
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+#schedule.every().hour.at("00:15").do(job)
 
+#while True:
+#    schedule.run_pending()
+#    time.sleep(1)
+
+job()

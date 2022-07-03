@@ -14,10 +14,10 @@ from app import main
 
 from freezegun import freeze_time
 
-from src.constants import LOGIN_ENDPOINT
-from src.constants import book_endpoint
+from src.bookgym.constants import LOGIN_ENDPOINT
+from src.bookgym.constants import book_endpoint
 
-from src.exceptions import NoBookingGoal
+from src.bookgym.exceptions import NoBookingGoal
 
 
 class TestGetBookingGoalTime:

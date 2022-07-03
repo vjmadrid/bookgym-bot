@@ -14,6 +14,7 @@ from configs.default import (
 )
 
 
+
 def setup_logger(app_path=None, logging_config=None):
 
     logs_path = os.path.join(app_path, LOGGING_PATH)

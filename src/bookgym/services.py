@@ -5,7 +5,7 @@ import logging
 
 from datetime import datetime
 
-from src.messages import (
+from src.bookgym.messages import (
     ERROR_BOOKING_GOALS_JSON_INVALID_PARAMETER,
     ERROR_TARGET_DAY_INVALID_PARAMETER,
 )

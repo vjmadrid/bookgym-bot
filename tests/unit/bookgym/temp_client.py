@@ -6,12 +6,10 @@ from unittest.mock import patch
 import pytest
 from requests import Session
 
-from src.client import AimHarderClient
-from src.exceptions import BookingFailed, IncorrectCredentials, TooManyWrongAttempts
-
-from src.constants import ERROR_TAG_ID
-
-from src.exceptions import MESSAGE_BOOKING_FAILED_NO_CREDIT, MESSAGE_BOOKING_FAILED_UNKNOWN
+from src.bookgym.clients import AimHarderClient
+from src.bookgym.exceptions import BookingFailed, IncorrectCredentials, TooManyWrongAttempts
+from src.bookgym.constants import ERROR_TAG_ID
+from src.bookgym.exceptions import MESSAGE_BOOKING_FAILED_NO_CREDIT, MESSAGE_BOOKING_FAILED_UNKNOWN
 
 
 class TestAimHarderClient:

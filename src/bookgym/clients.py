@@ -1,21 +1,22 @@
+# -*- coding: utf-8 -*-
+
+
 from datetime import datetime
 from http import HTTPStatus
-
 from bs4 import BeautifulSoup
 from requests import Session
 
-from src.constants import (
+from src.bookgym.constants import (
     LOGIN_ENDPOINT,
-    book_endpoint,
-    classes_endpoint,
     ERROR_TAG_ID,
 )
-from src.exceptions import BookingFailed, IncorrectCredentials, TooManyWrongAttempts
-from src.messages import (
+from src.bookgym.exceptions import BookingFailed, IncorrectCredentials, TooManyWrongAttempts
+from src.bookgym.messages import (
     MESSAGE_BOOKING_FAILED_UNKNOWN,
     MESSAGE_BOOKING_FAILED_NO_CREDIT,
     MESSAGE_BOOKING_FAILED_MORE_ONE_RESERVATION_SAME_TIME,
 )
+from src.bookgym.utils import URLUtils
 
 
 class AimHarderClient:
@@ -46,7 +47,7 @@ class AimHarderClient:
 
     def get_classes(self, target_day: datetime):
         response = self.session.get(
-            classes_endpoint(self.box_name),
+            URLUtils.generate_classes_endpoint(self.box_name),
             params={
                 "box": self.box_id,
                 "day": target_day.strftime("%Y%m%d"),
@@ -58,7 +59,7 @@ class AimHarderClient:
     def book_class(self, target_day: datetime, class_id: str):
 
         response = self.session.post(
-            book_endpoint(self.box_name),
+            URLUtils.generate_book_endpoint(self.box_name),
             data={
                 "id": class_id,
                 "day": target_day.strftime("%Y%m%d"),
