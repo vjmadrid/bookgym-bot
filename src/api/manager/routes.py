@@ -10,7 +10,6 @@ from . import constants
 manager_bp = Blueprint("api", __name__, url_prefix="/manager")
 
 
-
 @manager_bp.route(constants.HEALTH_ENDPOINT, endpoint="health")
 @manager_bp.route(constants.IS_ALIVE_ENDPOINT, endpoint="is_alive")
 def HealthManager():

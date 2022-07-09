@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 
 
-from src.bookgym.messages import (
-    ERROR_BOX_NAME_INVALID_PARAMETER
-)
+from src.bookgym.messages import ERROR_BOX_NAME_INVALID_PARAMETER
 
 
 class URLUtils:
-
     @staticmethod
     def generate_url_base(box_name):
         if (box_name is None) or (len(box_name) == 0):

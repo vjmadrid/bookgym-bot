@@ -14,7 +14,13 @@ pytest-mock
 pytest-cases
 pytest-asyncio
 
-freezegun
+autoflake
+
 requests-mock
 
+freezegun
+
 bandit
+safety
+
+pep8-naming

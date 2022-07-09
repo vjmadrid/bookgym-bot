@@ -22,8 +22,8 @@ exclude = '''
 
 [tool.pylint.messages_control]
 disable= """
-missing-module-docstring,missing-class-docstring,missing-function-docstring,no-self-use,
-too-few-public-methods,wrong-import-position,import-outside-toplevel,broad-except
+missing-module-docstring,missing-class-docstring,missing-function-docstring,
+too-few-public-methods,wrong-import-position,import-outside-toplevel,broad-except,too-many-arguments
 """
 max-line-length=100
 
@@ -36,7 +36,7 @@ max-nested-blocks=5
 ignore-comments=true
 ignore-docstrings=true
 ignore-imports=true
-min-similarity-lines=4
+min-similarity-lines=10
 
 
 

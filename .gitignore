@@ -199,4 +199,8 @@ cython_debug/
 # Ignore code-workspaces
 *.code-workspace
 
+# VsCode Files
+launch.json
+settings.json
+
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode

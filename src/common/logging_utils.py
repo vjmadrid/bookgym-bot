@@ -10,9 +10,8 @@ from configs.default import (
     LOGGING_YAML_CONFIG_FILE_DEFAULT,
     LOGGING_PATH,
     LOGGING_APP_FILE_NAME,
-    LOGGING_ERROR_FILE_NAME
+    LOGGING_ERROR_FILE_NAME,
 )
-
 
 
 def setup_logger(app_path=None, logging_config=None):
@@ -24,7 +23,7 @@ def setup_logger(app_path=None, logging_config=None):
 
     if logging_config is not None:
 
-        #if log_file_path is not None:
+        # if log_file_path is not None:
         #    logging_config["handlers"]["info_file_handler"]["filename"] = log_file_path
 
         logging.config.dictConfig(logging_config)
@@ -35,8 +34,12 @@ def setup_logger(app_path=None, logging_config=None):
             logging_config = yaml.safe_load(fh)
 
         if app_path is not None:
-            logging_config["handlers"]["info_file_handler"]["filename"] = logs_path + "/" + LOGGING_APP_FILE_NAME
-            logging_config["handlers"]["error_file_handler"]["filename"] = logs_path + "/" + LOGGING_ERROR_FILE_NAME
+            logging_config["handlers"]["info_file_handler"]["filename"] = (
+                logs_path + "/" + LOGGING_APP_FILE_NAME
+            )
+            logging_config["handlers"]["error_file_handler"]["filename"] = (
+                logs_path + "/" + LOGGING_ERROR_FILE_NAME
+            )
 
         logging.config.dictConfig(logging_config)
 

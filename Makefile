@@ -15,16 +15,56 @@ COLOR_CYAN := \033[0;36m
 COLOR_WHITE := \033[0;37m # Text Reset
 
 
+# Os Configuration
+
+ifeq ($(OS),Windows_NT)
+    OS_DETECTED := Windows
+else
+    OS_DETECTED := $(shell uname)
+endif
+
+# General Configuration
+
+ifeq ($(OS_DETECTED),Windows)
+EXECUTION_DIRECTORY_BY_ENVIRONMENT := Scripts
+else
+EXECUTION_DIRECTORY_BY_ENVIRONMENT := bin
+endif
+
+.DEFAULT_GOAL := help
+
+SHELL := /$(EXECUTION_DIRECTORY_BY_ENVIRONMENT)/bash
+VIRTUAL_LOCAL_ENV_NAME := venv
+
+EXECUTION_PATH := $(VIRTUAL_LOCAL_ENV_NAME)/$(EXECUTION_DIRECTORY_BY_ENVIRONMENT)
+
+PYTHON := $(EXECUTION_PATH)/python
+PIP := $(EXECUTION_PATH)/pip
+
+
 # App Configuration
 
-SHELL = /bin/bash
-.DEFAULT_GOAL := help
-VIRTUAL_LOCAL_ENV_NAME := venv
-PYTHON := $(VIRTUAL_LOCAL_ENV_NAME)/bin/python
-PIP := $(VIRTUAL_LOCAL_ENV_NAME)/bin/pip
+ENVIRONMENT := N/A
 START_FILE := app.py
+PORT := N/A
+
+
+
+# Docker Configuration
+
+DOCKER_PATH := $(shell which docker)
+DOCKER_VERSION_NUMBER := $(shell docker --version)
+DOCKER_PORT := 8081
+
+IMAGE_NAME := acme/cbookgym-bot
 CONTAINER_NAME := bookgym-bot
 
+IMAGE_DATE := $(shell date -j "+%Y%m%d%H%M")
+IMAGE_NAME_DATED := "${IMAGE_NAME}-$(IMAGE_DATE)"
+
+DOCKER_FILE_NAME := Dockerfile.gunicorn
+
+DOCKER_RUN_PARAMETER := -p ${DOCKER_PORT}:$(PORT) -e FLASK_ENV="${ENVIRONMENT}"
 
 
 # Plugins Configuration
@@ -35,11 +75,14 @@ BLACK_PARAMETER :=
 PYLINT_PARAMETER_DEBUG := -j 0 --output-format=colorized
 PYTLINT_PARAMETER := $(PYLINT_PARAMETER_DEBUG)
 
+AUTOFLAKE_PARAMETER_DEBUG := 
+AUTOFLAKE_PARAMETER := --remove-all-unused-imports --recursive --remove-unused-variables --in-place --exclude=__init__.py
+
 PYTEST_PARAMETER_CONSOLE := -s
 PYTEST_PARAMETER_SETUP := --setup-show
 
 PYTEST_PARAMETER_DEBUG := $(PYTEST_PARAMETER_CONSOLE)
-PYTEST_PARAMETER := -ra -vv 
+PYTEST_PARAMETER := -ra -vv $(PYTEST_PARAMETER_DEBUG)
 
 
 # *** CLEAN ***
@@ -116,22 +159,25 @@ install-dev-deps: ##Install dependencies 'dev-requirements.txt' file in the Loca
 
 install-test-deps: ##Install dependencies 'test-requirements.txt'
 	$(PIP) install -r test-requirements.txt
-	@make generate-requirements-deps
+	@make generate-requirements-deps-full
 
 generate-requirements-deps: ##Generate 'requirements.txt' file (With versions) in the Local Virtual Environment
 	$(PIP) freeze | grep -v -- '^-e' > requirements.txt
+
+generate-requirements-deps-full: ##Generate 'requirements-full.txt' file (With versions + test dependencies) in the Local Virtual Environment
+	$(PIP) freeze | grep -v -- '^-e' > requirements-full.txt
 
 reset-deps: ## Reset all requirements in the Local Virtual Environment in the Local Virtual Environment
 	$(PIP) freeze | xargs pip uninstall -y
 
 tree: ## Show dependency tree of packages
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/pipdeptree
+	$(EXECUTION_PATH)/pipdeptree
 
 tree-json: ## Show dependency tree of packages json
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/pipdeptree --json-tree
+	$(EXECUTION_PATH)/pipdeptree --json-tree
 
-tree-graph: ## Show dependency tree of packages graph
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/pipdeptree --graph-output png > dependencies.png
+tree-graph: ## Show dependency tree of packages graph -> ./reports/dependencies.png
+	$(EXECUTION_PATH)/pipdeptree --graph-output png > ./reports/dependencies.png
 
 
 
@@ -140,51 +186,85 @@ tree-graph: ## Show dependency tree of packages graph
 # *** FORMAT ***
 
 format: ##Format Code with check lint and static code
+	@echo -e ""
+	@echo -e "$(COLOR_GREEN)black execution ...$(COLOR_OFF)"
 	@echo -e "$(COLOR_CYAN)Use configuration via a file -> pyproject.toml$(COLOR_OFF)"
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/black --version
-	@echo -e "$(COLOR_CYAN)* Apply on 'src'$(COLOR_OFF)"
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/black $(BLACK_PARAMETER) app.py
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/black $(BLACK_PARAMETER) src
-	@echo -e "$(COLOR_CYAN)* Apply on 'tests'$(COLOR_OFF)"
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/black $(BLACK_PARAMETER) tests
+	$(EXECUTION_PATH)/black --version
+	@echo -e "$(COLOR_CYAN)* Apply black on 'src'$(COLOR_OFF)"
+	$(EXECUTION_PATH)/black $(BLACK_PARAMETER) src
+	@echo -e "$(COLOR_CYAN)* Apply black on 'configs'$(COLOR_OFF)"
+	$(EXECUTION_PATH)/black $(BLACK_PARAMETER) configs
+	@echo -e "$(COLOR_CYAN)* Apply black on 'tests'$(COLOR_OFF)"
+	$(EXECUTION_PATH)/black $(BLACK_PARAMETER) tests
+
+	@echo -e "\n$(COLOR_GREEN)autoflake execution ...$(COLOR_OFF)"
+	@echo -e "$(COLOR_CYAN)Use direct configuration$(COLOR_OFF)"
+	$(EXECUTION_PATH)/autoflake --version
+	@echo -e "$(COLOR_CYAN)* Apply autoflake on 'src'$(COLOR_OFF)"
+	$(EXECUTION_PATH)/autoflake $(AUTOFLAKE_PARAMETER) ./src
+	@echo -e "$(COLOR_CYAN)* Apply autoflake on 'configs'$(COLOR_OFF)"
+	$(EXECUTION_PATH)/autoflake $(AUTOFLAKE_PARAMETER) ./configs
+	@echo -e "$(COLOR_CYAN)* Apply autoflake on 'tests'$(COLOR_OFF)"
+	$(EXECUTION_PATH)/autoflake $(AUTOFLAKE_PARAMETER) ./tests
+	@echo -e "\n"
+
 
 format-check: ##Check Format Code
+	@echo -e ""
+	@echo -e "$(COLOR_GREEN)black execution ...$(COLOR_OFF)"
 	@echo -e "$(COLOR_CYAN)Use configuration via a file -> pyproject.toml$(COLOR_OFF)"
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/black --version
+	$(EXECUTION_PATH)/black --version
 	@echo -e "$(COLOR_CYAN)* Apply on 'src'$(COLOR_OFF)"
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/black $(BLACK_PARAMETER) src --check
+	$(EXECUTION_PATH)/black $(BLACK_PARAMETER) src --check
+	@echo -e "$(COLOR_CYAN)* Apply on 'configs'$(COLOR_OFF)"
+	$(EXECUTION_PATH)/black $(BLACK_PARAMETER) configs --check
 	@echo -e "$(COLOR_CYAN)* Apply on 'tests'$(COLOR_OFF)"
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/black $(BLACK_PARAMETER) tests --check
+	$(EXECUTION_PATH)/black $(BLACK_PARAMETER) tests --check
+	@echo -e "\n"
 
 lint-pylint: ##Lint Code with pylint on 'all'
+	@echo -e ""
+	@echo -e "$(COLOR_GREEN)pylint execution ...$(COLOR_OFF)"
 	@echo -e "$(COLOR_CYAN)Use configuration via a file -> pyproject.toml$(COLOR_OFF)"
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/pylint --version
+	$(EXECUTION_PATH)/pylint --version
 	@echo -e "$(COLOR_CYAN)* Apply on 'all'$(COLOR_OFF)"
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/pylint $(PYTLINT_PARAMETER) src configs tests
+	$(EXECUTION_PATH)/pylint $(PYTLINT_PARAMETER) src configs tests
+	@echo -e "\n"
 
 lint-pylint-src: ##Lint Code with pylint on 'src'
+	@echo -e ""
+	@echo -e "$(COLOR_GREEN)pylint execution ...$(COLOR_OFF)"
 	@echo -e "$(COLOR_CYAN)Use configuration via a file -> pyproject.toml$(COLOR_OFF)"
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/pylint --version
+	$(EXECUTION_PATH)/pylint --version
 	@echo -e "$(COLOR_CYAN)* Apply on 'src'$(COLOR_OFF)"
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/pylint $(PYTLINT_PARAMETER) src
+	$(EXECUTION_PATH)/pylint $(PYTLINT_PARAMETER) src
+	@echo -e "\n"
 
 lint-pylint-configs: ##Lint Code with pylint on 'configs'
+	@echo -e ""
+	@echo -e "$(COLOR_GREEN)pylint execution ...$(COLOR_OFF)"
 	@echo -e "$(COLOR_CYAN)Use configuration via a file -> pyproject.toml$(COLOR_OFF)"
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/pylint --version
+	$(EXECUTION_PATH)/pylint --version
 	@echo -e "$(COLOR_CYAN)* Apply on 'configs'$(COLOR_OFF)"
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/pylint $(PYTLINT_PARAMETER) configs
+	$(EXECUTION_PATH)/pylint $(PYTLINT_PARAMETER) configs
+	@echo -e "\n"
 
 lint-pylint-tests: ##Lint Code with pylint on 'tests'
+	@echo -e ""
+	@echo -e "$(COLOR_GREEN)pylint execution ...$(COLOR_OFF)"
 	@echo -e "$(COLOR_CYAN)Use configuration via a file -> pyproject.toml$(COLOR_OFF)"
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/pylint --version
+	$(EXECUTION_PATH)/pylint --version
 	@echo -e "$(COLOR_CYAN)* Apply on 'tests'$(COLOR_OFF)"
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/pylint $(PYTLINT_PARAMETER) tests
+	$(EXECUTION_PATH)/pylint $(PYTLINT_PARAMETER) tests
+	@echo -e "\n"
 
 lint-flake8: ##flake8 Lint Code
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/flake8 --version
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/flake8 src
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/flake8 configs
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/flake8 tests
+	@echo -e ""
+	@echo -e "$(COLOR_GREEN)flake8 execution ...$(COLOR_OFF)"
+	$(EXECUTION_PATH)/flake8 --version
+	$(EXECUTION_PATH)/flake8 src
+	$(EXECUTION_PATH)/flake8 configs
+	$(EXECUTION_PATH)/flake8 tests
 
 
 
@@ -193,36 +273,66 @@ lint-flake8: ##flake8 Lint Code
 # *** TEST ***
 
 test: clean ##Run all tests of all types
+	@echo -e ""
+	@echo -e "$(COLOR_GREEN)pytest execution ...$(COLOR_OFF)"
 	@echo -e "$(COLOR_CYAN)* Apply on 'all'$(COLOR_OFF)"
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/pytest $(PYTEST_PARAMETER) -v
+	$(EXECUTION_PATH)/pytest $(PYTEST_PARAMETER) -v
 
 test-unit: clean ##Runs all tests of the "unit" type
+	@echo -e ""
+	@echo -e "$(COLOR_GREEN)pytest execution ...$(COLOR_OFF)"
 	@echo -e "$(COLOR_CYAN)* Apply on 'unit'$(COLOR_OFF)"
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/pytest $(PYTEST_PARAMETER) -v tests/unit/
+	$(EXECUTION_PATH)/pytest $(PYTEST_PARAMETER) -v tests/unit/
 
 test-lint: ##Lint and static-check code
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/pytest --cache-clear --flake8
+	@echo -e ""
+	@echo -e "$(COLOR_GREEN)pytest + flake8 execution ...$(COLOR_OFF)"
+	$(EXECUTION_PATH)/pytest --cache-clear --flake8
 
 test-coverage: ##Run tests with coverage
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/coverage --version
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/coverage erase
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/coverage run --include=src/* -m pytest -ra
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/coverage report -m
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/coverage html -d ./reports/coverage_html
+	@echo -e ""
+	@echo -e "$(COLOR_GREEN)coverage execution ...$(COLOR_OFF)"
+	$(EXECUTION_PATH)/coverage --version
+	$(EXECUTION_PATH)/coverage erase
+	$(EXECUTION_PATH)/coverage run --include=src/* -m pytest -ra
+	$(EXECUTION_PATH)/coverage report -m
+	$(EXECUTION_PATH)/coverage html -d ./reports/coverage_html
 
+test-lab: clean ##TEST LAB (Run specifict test)
+	@echo -e ""
+	@echo -e "$(COLOR_GREEN)pytest execution ...$(COLOR_OFF)"
+	@echo -e "$(COLOR_CYAN)* Apply on 'all'$(COLOR_OFF)"
+	$(EXECUTION_PATH)/pytest $(PYTEST_PARAMETER) -v ./tests/unit/mongodb/test_simple_mongodb_connection_settings.py
+	#$(EXECUTION_PATH)/pytest $(PYTEST_PARAMETER) -v ./tests/unit/common/util/folder/test_folder_util.py
 
 
 # *** SECURITY ***
 
-security-check: ## Check security code (with pyproject.toml config file)
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/bandit --version
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/bandit -r src
+security-bandit-check: ## Check security code (with pyproject.toml config file)
+	@echo -e ""
+	@echo -e "$(COLOR_GREEN)bandit execution ...$(COLOR_OFF)"
+	$(EXECUTION_PATH)/bandit --version
+	@echo -e "$(COLOR_CYAN)* Apply on 'src'$(COLOR_OFF)"
+	$(EXECUTION_PATH)/bandit -r src
 
-security-check-all: ## Check security ALL code (with pyproject.toml config file)
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/bandit --version
-	$(VIRTUAL_LOCAL_ENV_NAME)/bin/bandit -r .
+security-bandit-check-all: ## Check security ALL code (with pyproject.toml config file)
+	@echo -e ""
+	@echo -e "$(COLOR_GREEN)bandit execution ...$(COLOR_OFF)"
+	$(EXECUTION_PATH)/bandit --version
+	@echo -e "$(COLOR_CYAN)* Apply on 'ALL'$(COLOR_OFF)"
+	$(EXECUTION_PATH)/bandit -r .
 
+security-safety-check: ## Check security code with safety (local)
+	@echo -e "\n$(COLOR_GREEN)safety execution ...$(COLOR_OFF)"
+	$(EXECUTION_PATH)/safety check
 
+security-safety-dev-requirements-check: ## Check security code with safety (dev-requirements.txt)
+	@echo -e "\n$(COLOR_GREEN)safety execution ...$(COLOR_OFF)"
+	$(EXECUTION_PATH)/safety check -r dev-requirements.txt
+
+security-safety-requirements-check: ## Check security code with safety (requirements.txt)
+	@echo -e "\n$(COLOR_GREEN)safety execution ...$(COLOR_OFF)"
+	$(EXECUTION_PATH)/safety check -r requirements.txt
 
 
 
@@ -267,8 +377,37 @@ run: ## Run Application
 
 # *** DOCKER ***
 
-docker-build: ##Build docker image for default architecture 
-	docker build --no-cache	-t $(CONTAINER_NAME) .
+docker-clean: ##Execute docker clean
+	PARAM=$$(docker ps -q) && docker kill $$PARAM
+
+docker-build: ##Build docker image (default Dockerfile -> Only Flask)
+	docker build --no-cache	-t $(IMAGE_NAME) .
+
+docker-build-gunicorn: ##Build docker image ('Dockerfile.gunicorn' Dockerfile -> Flask + Gunicorn)
+	docker build --no-cache	-t $(IMAGE_NAME) -f Dockerfile.gunicorn .
+
+docker-build-param: ##Build docker image with Dockerfile parameter
+	docker build -t $(IMAGE_NAME) -f $(DOCKER_FILE_NAME) .
+
+docker-run: ##Execute docker image for default architecture
+	@echo -e ""
+	@echo -e "Environment : $(COLOR_GREEN)$(ENVIRONMENT)$(COLOR_OFF)"
+	@echo -e "Port : $(COLOR_GREEN)$(DOCKER_PORT)$(COLOR_OFF)"
+	docker run --name $(CONTAINER_NAME) $(DOCKER_RUN_PARAMETER) -d $(IMAGE_NAME)
+
+docker-stop: ##Execute docker stop
+	ID=$$(docker ps -f name=$(CONTAINER_NAME) |tail -1 |colrm 12) && docker stop $$ID
+
+docker-logs: ##Execute docker logs
+	ID=$$(docker ps -a -f name=$(CONTAINER_NAME) |tail -1 |colrm 12) && docker logs $$ID
+
+docker-ssh: ##Execute docker image with ssh
+	ID=$$(docker ps -f name=$(CONTAINER_NAME) |tail -1 |colrm 12) && docker exec -it $$ID bash
+
+docker-push: ##Push docker image
+	docker tag $(IMAGE_NAME) $(IMAGE_NAME_DATED)
+	docker push $(IMAGE_NAME)
+	docker push $(IMAGE_NAME_DATED)
 
 docker-tests:
 	docker exec $(CONTAINER_NAME) /bin/sh -c 'make tests'

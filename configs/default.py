@@ -1,22 +1,61 @@
-# -*- coding: utf-8 -*-
-
-
 import os
 
+import src.common.logging.constants as logging_constants
 
 
-# Define the application directory
+# Define the names ot the directories
+SOURCE_DIRECTORY_NAME = "src"
+CONFIG_DIRECTORY_NAME = "configs"
+TEST_DIRECTORY_NAME = "tests"
+DOC_DIRECTORY_NAME = "docs"
+DATA_DIRECTORY_NAME = "data"
+REPORT_DIRECTORY_NAME = "reports"
+LOGS_DIRECTORY_NAME = "logs"
+LOAD_DIRECTORY_NAME = "load"
+TEMPLATE_DIRECTORY_NAME = "templates"
+IMAGES_DIRECTORY_NAME = "images"
+STATIC_DIRECTORY_NAME = "static"
+DOWNLOAD_DIRECTORY_NAME = "downloads"
+
+
+# Define the application directory path
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-SOURCE_PATH = os.path.join(BASE_DIR, "src")
-CONFIG_PATH = os.path.join(BASE_DIR, "configs")
-DOCS_PATH = os.path.join(BASE_DIR, "docs")
-TESTS_PATH = os.path.join(BASE_DIR, "tests")
-DATA_PATH = os.path.join(BASE_DIR, "data")
-REPORTS_PATH = os.path.join(BASE_DIR, "reports")
+
+# Define the application directories path
+SOURCE_DIR = os.path.join(BASE_DIR, SOURCE_DIRECTORY_NAME)
+CONFIG_DIR = os.path.join(BASE_DIR, CONFIG_DIRECTORY_NAME)
+TEST_DIR = os.path.join(BASE_DIR, TEST_DIRECTORY_NAME)
+DOC_DIR = os.path.join(BASE_DIR, DOC_DIRECTORY_NAME)
+DATA_DIR = os.path.join(BASE_DIR, DATA_DIRECTORY_NAME)
+REPORT_DIR = os.path.join(BASE_DIR, REPORT_DIRECTORY_NAME)
+LOGS_DIR = os.path.join(BASE_DIR, LOGS_DIRECTORY_NAME)
+LOAD_DIR = os.path.join(BASE_DIR, LOAD_DIRECTORY_NAME)
+TEMPLATE_DIR = os.path.join(BASE_DIR, TEMPLATE_DIRECTORY_NAME)
+IMAGES_DIR = os.path.join(BASE_DIR, IMAGES_DIRECTORY_NAME)
+STATIC_DIR = os.path.join(BASE_DIR, STATIC_DIRECTORY_NAME)
+DOWNLOAD_DIR = os.path.join(BASE_DIR, DOWNLOAD_DIRECTORY_NAME)
 
 
-# *** Logging Config ***
+# Define configuration files per environment
+LOCAL_CONFIG_FILE = "configs.local"
+DEVELOPMENT_CONFIG_FILE = "configs.local"
+TESTING_CONFIG_FILE = "configs.testing"
+STAGING_CONFIG_FILE = "configs.stage"
+PRODUCTION_CONFIG_FILE = "configs.prod"
+
+config_file_by_environment_name = dict(
+    default=LOCAL_CONFIG_FILE,
+    local=LOCAL_CONFIG_FILE,
+    development=LOCAL_CONFIG_FILE,
+    testing=TESTING_CONFIG_FILE,
+    staging=STAGING_CONFIG_FILE,
+    production=PRODUCTION_CONFIG_FILE,
+)
+
+# Define log configuration
+# LOGGING_CONFIGURATION_FILE = CONFIG_DIR + "/" + logging_constants.DEFAULT_LOGGING_YAML_CONFIG_FILE
+
 LOGGING_SERVICE_NAME_KEY = "logging_service_name"
 LOGGING_PATH_KEY = "./logs/"
 LOGGING_FILE_NAME_KEY = "log_file.log"
@@ -27,12 +66,8 @@ ENABLE_CONSOLE_KEY = "enable_console"
 ENABLE_NOTIFICATIONS_KEY = "enable_notifications"
 
 LOGGING_PATH = "logs"
-LOGGING_APP_FILE_NAME = "fitbot.log"
-LOGGING_ERROR_FILE_NAME = "fitbot-error.log"
-
-LOGGING_FORMATTER_PATTERN_GENERAL_DEFAULT= "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-LOGGING_FORMATTER_PATTERN_FILE_DEFAULT = f"[%(levelname)s]:%(asctime)s:%(module)s:%(lineno)d:%(name)s:%(message)s"
-LOGGING_FORMATTER_PATTERN_CONSOLE_DEFAULT = "[%(levelname)s]: %(message)s"
+LOGGING_APP_FILE_NAME = "bookgym.log"
+LOGGING_ERROR_FILE_NAME = "bookgym-error.log"
 
 
-LOGGING_YAML_CONFIG_FILE_DEFAULT = 'logging.yaml'
+LOGGING_YAML_CONFIG_FILE_DEFAULT = "logging.yaml"
