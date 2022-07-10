@@ -169,6 +169,7 @@ cython_debug/
 # Created by vjmadrid
 
 .logs/
+docker-compose-test.yaml
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode

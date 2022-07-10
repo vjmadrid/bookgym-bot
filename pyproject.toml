@@ -63,3 +63,7 @@ source = ["src"]
 [tool.coverage.report]
 show_missing = true
 fail_under = 60
+
+[tool.isort]
+profile = "black"
+src_paths = ["src", "tests", "configs"]

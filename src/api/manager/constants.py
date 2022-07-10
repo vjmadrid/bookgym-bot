@@ -1,3 +1,5 @@
+# Endoints
+
 ROOT_ENDPOINT = "/manager"
 
 HEALTH_ENDPOINT = "/health"

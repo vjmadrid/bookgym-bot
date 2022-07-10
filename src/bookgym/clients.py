@@ -3,18 +3,20 @@
 
 from datetime import datetime
 from http import HTTPStatus
+
 from bs4 import BeautifulSoup
 from requests import Session
 
-from src.bookgym.constants import (
-    LOGIN_ENDPOINT,
-    ERROR_TAG_ID,
+from src.bookgym.constants import ERROR_TAG_ID, LOGIN_ENDPOINT
+from src.bookgym.exceptions import (
+    BookingFailed,
+    IncorrectCredentials,
+    TooManyWrongAttempts,
 )
-from src.bookgym.exceptions import BookingFailed, IncorrectCredentials, TooManyWrongAttempts
 from src.bookgym.messages import (
-    MESSAGE_BOOKING_FAILED_UNKNOWN,
-    MESSAGE_BOOKING_FAILED_NO_CREDIT,
     MESSAGE_BOOKING_FAILED_MORE_ONE_RESERVATION_SAME_TIME,
+    MESSAGE_BOOKING_FAILED_NO_CREDIT,
+    MESSAGE_BOOKING_FAILED_UNKNOWN,
 )
 from src.bookgym.utils import URLUtils
 
@@ -41,7 +43,8 @@ class AimHarderClient:
         if soup is not None:
             if TooManyWrongAttempts.key_phrase in soup.text:
                 raise TooManyWrongAttempts
-            elif IncorrectCredentials.key_phrase in soup.text:
+
+            if IncorrectCredentials.key_phrase in soup.text:
                 raise IncorrectCredentials
         return session
 

@@ -2,10 +2,11 @@
 
 
 import unittest
+
 import pytest
 
-from src.bookgym.utils import URLUtils
 from src.bookgym.messages import ERROR_BOX_NAME_INVALID_PARAMETER
+from src.bookgym.utils import URLUtils
 from tests.unit.bookgym.bookgym_dummy_data_factory import BookgymDummyDataFactory
 
 

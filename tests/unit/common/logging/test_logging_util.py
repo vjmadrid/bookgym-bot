@@ -1,15 +1,13 @@
-import unittest
 import os
 import tempfile
+import unittest
+
 import pytest
 
-
-from src.common.logging import utils
-from src.common.logging.messages import ERROR_LOGS_TARGET_PATH_INVALID_PARAMETER
-from src.common.logging.constants import LOGGING_CONFIG_BASIC, LOGGING_CONFIG_YAML
-
 from configs.default import LOGGING_PATH
-
+from src.common.logging import utils
+from src.common.logging.constants import LOGGING_CONFIG_BASIC, LOGGING_CONFIG_YAML
+from src.common.logging.messages import ERROR_LOGS_TARGET_PATH_INVALID_PARAMETER
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 

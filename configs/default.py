@@ -1,7 +1,6 @@
 import os
 
-import src.common.logging.constants as logging_constants
-
+from src.common.logging import constants as logging_constants
 
 # Define the names ot the directories
 SOURCE_DIRECTORY_NAME = "src"
@@ -54,7 +53,10 @@ config_file_by_environment_name = dict(
 )
 
 # Define log configuration
-# LOGGING_CONFIGURATION_FILE = CONFIG_DIR + "/" + logging_constants.DEFAULT_LOGGING_YAML_CONFIG_FILE
+LOGGING_CONFIGURATION_FILE = os.path.join(
+    CONFIG_DIR, logging_constants.DEFAULT_LOGGING_YAML_CONFIG_FILE
+)
+
 
 LOGGING_SERVICE_NAME_KEY = "logging_service_name"
 LOGGING_PATH_KEY = "./logs/"

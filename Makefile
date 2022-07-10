@@ -84,6 +84,9 @@ PYTEST_PARAMETER_SETUP := --setup-show
 PYTEST_PARAMETER_DEBUG := $(PYTEST_PARAMETER_CONSOLE)
 PYTEST_PARAMETER := -ra -vv $(PYTEST_PARAMETER_DEBUG)
 
+ISORT_PARAMETER_DEBUG := 
+ISORT_PARAMETER := --profile black
+
 
 # *** CLEAN ***
 
@@ -190,6 +193,8 @@ format: ##Format Code with check lint and static code
 	@echo -e "$(COLOR_GREEN)black execution ...$(COLOR_OFF)"
 	@echo -e "$(COLOR_CYAN)Use configuration via a file -> pyproject.toml$(COLOR_OFF)"
 	$(EXECUTION_PATH)/black --version
+	@echo -e "$(COLOR_CYAN)* Apply black on '$(START_FILE)'$(COLOR_OFF)"
+	$(EXECUTION_PATH)/black $(BLACK_PARAMETER) $(START_FILE) 
 	@echo -e "$(COLOR_CYAN)* Apply black on 'src'$(COLOR_OFF)"
 	$(EXECUTION_PATH)/black $(BLACK_PARAMETER) src
 	@echo -e "$(COLOR_CYAN)* Apply black on 'configs'$(COLOR_OFF)"
@@ -200,13 +205,23 @@ format: ##Format Code with check lint and static code
 	@echo -e "\n$(COLOR_GREEN)autoflake execution ...$(COLOR_OFF)"
 	@echo -e "$(COLOR_CYAN)Use direct configuration$(COLOR_OFF)"
 	$(EXECUTION_PATH)/autoflake --version
+	@echo -e "$(COLOR_CYAN)* Apply autoflake on '$(START_FILE)'$(COLOR_OFF)"
+	$(EXECUTION_PATH)/autoflake $(AUTOFLAKE_PARAMETER) $(START_FILE)
 	@echo -e "$(COLOR_CYAN)* Apply autoflake on 'src'$(COLOR_OFF)"
 	$(EXECUTION_PATH)/autoflake $(AUTOFLAKE_PARAMETER) ./src
 	@echo -e "$(COLOR_CYAN)* Apply autoflake on 'configs'$(COLOR_OFF)"
 	$(EXECUTION_PATH)/autoflake $(AUTOFLAKE_PARAMETER) ./configs
 	@echo -e "$(COLOR_CYAN)* Apply autoflake on 'tests'$(COLOR_OFF)"
 	$(EXECUTION_PATH)/autoflake $(AUTOFLAKE_PARAMETER) ./tests
+
+	@echo -e "\n$(COLOR_GREEN)isort execution ...$(COLOR_OFF)"
+	@echo -e "$(COLOR_CYAN)Use configuration via a file -> pyproject.toml$(COLOR_OFF)"
+	@echo -e "$(COLOR_CYAN)* Apply isort on '$(START_FILE)'$(COLOR_OFF)"
+	$(EXECUTION_PATH)/isort $(ISORT_PARAMETER) $(START_FILE)
+	@echo -e "$(COLOR_CYAN)* Apply isort on 'all'$(COLOR_OFF)"
+	$(EXECUTION_PATH)/isort $(ISORT_PARAMETER) .
 	@echo -e "\n"
+
 
 
 format-check: ##Check Format Code
@@ -262,6 +277,7 @@ lint-flake8: ##flake8 Lint Code
 	@echo -e ""
 	@echo -e "$(COLOR_GREEN)flake8 execution ...$(COLOR_OFF)"
 	$(EXECUTION_PATH)/flake8 --version
+	$(EXECUTION_PATH)/flake8 $(START_FILE)
 	$(EXECUTION_PATH)/flake8 src
 	$(EXECUTION_PATH)/flake8 configs
 	$(EXECUTION_PATH)/flake8 tests
@@ -306,6 +322,9 @@ test-lab: clean ##TEST LAB (Run specifict test)
 	#$(EXECUTION_PATH)/pytest $(PYTEST_PARAMETER) -v ./tests/unit/common/util/folder/test_folder_util.py
 
 
+
+
+
 # *** SECURITY ***
 
 security-bandit-check: ## Check security code (with pyproject.toml config file)
@@ -333,6 +352,8 @@ security-safety-dev-requirements-check: ## Check security code with safety (dev-
 security-safety-requirements-check: ## Check security code with safety (requirements.txt)
 	@echo -e "\n$(COLOR_GREEN)safety execution ...$(COLOR_OFF)"
 	$(EXECUTION_PATH)/safety check -r requirements.txt
+
+
 
 
 
@@ -372,6 +393,7 @@ dist: clean dist-sdist dist-wheel ##Distribute source and wheel package
 
 run: ## Run Application
 	PYTHONPATH=src $(PYTHON) $(START_FILE) --email=$(email) --password=$(password) --booking-goals=$(booking-goals) --box-name=$(box-name) --box-id=$(box-id) --days-in-advance=$(days-in-advance)
+
 
 
 

@@ -2,13 +2,14 @@
 
 
 import unittest
+
 import pytest
 
-from src.bookgym.services import BookingService
 from src.bookgym.messages import (
     ERROR_BOOKING_GOALS_JSON_INVALID_PARAMETER,
     ERROR_TARGET_DAY_INVALID_PARAMETER,
 )
+from src.bookgym.services import BookingService
 from tests.unit.bookgym.bookgym_dummy_data_factory import BookgymDummyDataFactory
 
 

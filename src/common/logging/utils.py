@@ -1,16 +1,18 @@
 import logging
 import logging.config
 import os
+from pathlib import Path
+
 import yaml
 
 from configs.default import LOGGING_APP_FILE_NAME, LOGGING_ERROR_FILE_NAME
 
+from . import messages
 from .constants import (
+    DEFAULT_LOGGING_CONSOLE_FORMATTER_PATTERN,
     LOGGING_CONFIG_BASIC,
     LOGGING_CONFIG_YAML,
-    DEFAULT_LOGGING_CONSOLE_FORMATTER_PATTERN,
 )
-from . import messages
 
 
 def setup_console_logging(logging_level=logging.INFO):
@@ -47,11 +49,11 @@ def setup_logging(config_file=None, logs_target_path=None, logging_level=logging
 
                     logging_config = yaml.safe_load(file_handler)
 
-                    logging_config["handlers"]["info_file_handler"]["filename"] = (
-                        logs_target_path + "/" + LOGGING_APP_FILE_NAME
+                    logging_config["handlers"]["info_file_handler"]["filename"] = Path(
+                        logs_target_path, LOGGING_APP_FILE_NAME
                     )
-                    logging_config["handlers"]["error_file_handler"]["filename"] = (
-                        logs_target_path + "/" + LOGGING_ERROR_FILE_NAME
+                    logging_config["handlers"]["error_file_handler"]["filename"] = Path(
+                        logs_target_path, LOGGING_ERROR_FILE_NAME
                     )
 
                     logging.config.dictConfig(logging_config)

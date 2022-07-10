@@ -1,22 +1,13 @@
 import datetime
+from contextlib import nullcontext as does_not_raise
 from http import HTTPStatus
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
 
 import pytest
-
-from contextlib import nullcontext as does_not_raise
-
-from app import get_class_to_book
-
-from app import get_booking_goal_time
-
-from app import main
-
+from app import get_booking_goal_time, get_class_to_book, main
 from freezegun import freeze_time
 
-from src.bookgym.constants import LOGIN_ENDPOINT
-from src.bookgym.constants import book_endpoint
-
+from src.bookgym.constants import LOGIN_ENDPOINT, book_endpoint
 from src.bookgym.exceptions import NoBookingGoal
 
 
