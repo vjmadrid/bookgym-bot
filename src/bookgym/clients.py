@@ -21,6 +21,7 @@ from src.bookgym.messages import (
 from src.bookgym.utils import URLUtils
 
 
+
 class AimHarderClient:
     def __init__(self, email: str, password: str, box_id: int, box_name: str):
         self.session = self._login(email, password)
